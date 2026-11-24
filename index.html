@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Merey Namazbay — Вечерняя коллекция</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #faf6f2; color: #391c27; font: 17px/1.5 Arial, sans-serif; }
+    header, main, footer { max-width: 1100px; margin: auto; padding: 24px 6%; }
+    header { border-bottom: 1px solid #dacbd0; font: italic 28px Georgia, serif; }
+    h1, h2 { margin: 12px 0; font: normal clamp(36px, 6vw, 74px)/1.05 Georgia, serif; }
+    .look { display: grid; grid-template-columns: 1fr 1fr; background: #491b2b; color: white; }
+    .look img { width: 100%; height: min(66vh, 620px); object-fit: contain; background: #efe8e4; }
+    .info { padding: clamp(24px, 5vw, 64px); align-self: center; }
+    .price { font-size: 24px; }
+    button { padding: 10px 16px; margin: 4px 4px 4px 0; border: 1px solid #dbcbd0;
+      background: white; color: #391c27; cursor: pointer; font: inherit; }
+    button[aria-pressed="true"] { background: #491b2b; color: white; }
+    .controls { margin: 16px 0; }
+    footer { border-top: 1px solid #dacbd0; }
+    @media (max-width: 650px) {
+      .look { grid-template-columns: 1fr; }
+      .look img { height: 48vh; }
+    }
+  </style>
+</head>
+<body>
+  <header>Merey Namazbay</header>
+  <main>
+    <h1>Вечерняя коллекция</h1>
+    <p>Четыре образа от 20 000 до 200 000 ₸. На фото — референсы будущей коллекции.</p>
+
+    <section class="look" aria-label="Выбранное платье">
+      <img id="photo" alt="">
+      <div class="info">
+        <span id="counter"></span>
+        <h2 id="name"></h2>
+        <p id="description"></p>
+        <p class="price" id="price"></p>
+        <button id="play" type="button">Пауза</button>
+      </div>
+    </section>
+    <div class="controls" id="choices" aria-label="Выбор платья"></div>
+  </main>
+  <footer>
+    <strong>Мерей Намазбай</strong>
+    <p>Здесь я собираю образы для своей коллекции вечерних платьев. Цены предварительные.</p>
+  </footer>
+
+  <script>
+    // Здесь можно менять названия, цены, описания и фотографии.
+    const dresses = [
+      {
+        name: "Пион", price: "20 000 ₸",
+        description: "Открытые плечи и насыщенный ягодный оттенок.",
+        photo: "https://thumb.braavo.me/vivadress/600/3022993841.webp"
+      },
+      {
+        name: "Изумруд", price: "55 000 ₸",
+        description: "Глубокий зелёный и мягкий блеск ткани.",
+        photo: "https://prettylavish.co.uk/cdn/shop/files/Amelia_Tie_Emerald_1860_1_d73be309-e9c3-4a92-9bfa-6face83ae07a.jpg?v=1769628294"
+      },
+      {
+        name: "Бордо", price: "110 000 ₸",
+        description: "Винный атлас для вечернего выхода.",
+        photo: "https://www.scstudiosvn.com/cdn/shop/files/UntitledSession120595.jpg?v=1769669529&width=1000"
+      },
+      {
+        name: "Полночь", price: "200 000 ₸",
+        description: "Россыпь кристаллов на тёмном фоне.",
+        photo: "https://www.talkingthreads.in/cdn/shop/files/TT-2116GW-LH04_2400x.jpg?v=1776955283"
+      }
+    ];
+
+    const element = id => document.getElementById(id);
+    let current = 0;
+    let timer;
+    let paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function show(index) {
+      current = index;
+      const dress = dresses[index];
+      element("photo").src = dress.photo;
+      element("photo").alt = dress.name + ". " + dress.description;
+      element("name").textContent = dress.name;
+      element("description").textContent = dress.description;
+      element("price").textContent = dress.price;
+      element("counter").textContent = (index + 1) + " / " + dresses.length;
+      element("play").textContent = paused ? "Продолжить показ" : "Пауза";
+      [...element("choices").children].forEach((button, i) => {
+        button.setAttribute("aria-pressed", String(i === index));
+      });
+      clearTimeout(timer);
+      if (!paused) timer = setTimeout(() => show((index + 1) % dresses.length), 5000);
+    }
+
+    dresses.forEach((dress, index) => {
+      const button = document.createElement("button");
+      button.textContent = dress.name;
+      button.onclick = () => show(index);
+      element("choices").append(button);
+    });
+    element("play").onclick = () => { paused = !paused; show(current); };
+    show(0);
+  </script>
+</body>
+</html>
